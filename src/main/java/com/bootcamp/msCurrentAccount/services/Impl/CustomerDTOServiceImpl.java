@@ -32,7 +32,7 @@ public class CustomerDTOServiceImpl implements ICustomerDTOService {
         LOGGER.info("initializing client query");
         params.put("customerIdentityNumber",customerIdentityNumber);
         return client
-                .baseUrl("http://localhost:8081/customer")
+                .baseUrl("http://CUSTOMER-SERVICE/customer")
                 .build()
                 .get()
                 .uri("/findCustomerCredit/{customerIdentityNumber}",customerIdentityNumber)
@@ -45,7 +45,7 @@ public class CustomerDTOServiceImpl implements ICustomerDTOService {
     public Mono<Customer> newPan(String id, Customer customer) {
         LOGGER.info("initializing Customer cards");
         return client
-                .baseUrl("http://localhost:8081/customer")
+                .baseUrl("http://CUSTOMER-SERVICE/customer")
                 .build()
                 .put()
                 .uri("/cards/{id}", Collections.singletonMap("id", id))

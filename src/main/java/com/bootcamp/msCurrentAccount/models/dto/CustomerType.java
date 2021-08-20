@@ -9,6 +9,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
 
+/**
+ * The type Customer type.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

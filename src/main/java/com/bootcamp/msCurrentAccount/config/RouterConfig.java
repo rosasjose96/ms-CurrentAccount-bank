@@ -26,9 +26,10 @@ public class RouterConfig {
     public RouterFunction<ServerResponse> routes(AccountHandler accountHandler){
 
         return route(GET("/api/currentAccount"), accountHandler::findAll)
-                .andRoute(GET("/api/currentAccount/{customerIdentityNumber}"),accountHandler::findByCustomerIdentityNumber)
+                .andRoute(GET("/api/currentAccount/{customerIdentityNumber}"),accountHandler::findAllByCustomerIdentityNumber)
+                .andRoute(GET("/api/currentAccount/customer/{customerIdentityNumber}"),accountHandler::findByCustomerIdentityNumber)
                 .andRoute(GET("/api/currentAccount/account/{accountNumber}"), accountHandler::findByAccountNumber)
-                .andRoute(GET("/api/currentAccount/holder/{accountNumber}"), accountHandler::addCardHolder)
+                .andRoute(PUT("/api/currentAccount/holder/{accountNumber}"), accountHandler::addCardHolder)
                 .andRoute(POST("/api/currentAccount"), accountHandler::newCurrentAccount)
                 .andRoute(PUT("/api/currentAccount/{id}"), accountHandler::updateCurrentAccount)
                 .andRoute(DELETE("/api/currentAccount/{id}"), accountHandler::deleteCurrentAccount);

@@ -17,9 +17,7 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerType {
-    @Id
-    @NotEmpty
-    private String id;
+
     private String code;
     private String name;
 }

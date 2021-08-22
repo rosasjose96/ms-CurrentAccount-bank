@@ -14,10 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Customer {
 
-    private String id;
     private String name;
     private String customerIdentityType;
     private String customerIdentityNumber;
     private CustomerType customerType;
-    private String debitCard;
 }

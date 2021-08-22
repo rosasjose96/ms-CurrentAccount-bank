@@ -55,13 +55,18 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
-    public Mono<Account> findByCustomerIdentityNumber(String customerIdentityNumber) {
-        return repository.findByCustomerIdentityNumber(customerIdentityNumber);
+    public Flux<Account> findAllByCustomerIdentityNumber(String customerIdentityNumber) {
+        return repository.findAllByCustomerIdentityNumber(customerIdentityNumber);
     }
 
     @Override
     public Mono<Account> findByAccountNumber(String accountNumber) {
         LOGGER.info("El AccountNumber es" + accountNumber);
         return repository.findByAccountNumber(accountNumber);
+    }
+
+    @Override
+    public Mono<Account> findByCustomerIdentityNumber(String customerIdentityNumber) {
+        return repository.findByCustomerIdentityNumber(customerIdentityNumber);
     }
 }

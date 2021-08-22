@@ -74,26 +74,18 @@ public class AccountHandler {
                 .flatMap(customer ->
                 {
                     account.getTitulares().get(0).setName(customer.getName());
-                    if(customer.getDebitCard()==null && (customer.getCustomerType().getCode().equals("1001")
-                    ||customer.getCustomerType().getCode().equals("1002"))){
-                        customer.setDebitCard(account.getTitulares().get(0).getDebitCard());
-                        LOGGER.info("Antes de actualizar pan" + customer.getName());
-                        return customerService.newPan(customer.getId(), customer);
-                    }
                     return customerService.getCustomer(account.getCustomerIdentityNumber());
                 })
                 .flatMap(titular -> customerService.getCustomer(account.getCustomerIdentityNumber())
                 )
                 .flatMap(customer -> {
                     account.setTypeOfAccount("CURRENT_ACCOUNT");
-                    account.setMaxLimitMovementPerMonth(5);
+                    account.setMaxLimitMovementPerMonth(account.getMaxLimitMovementPerMonth());
                     account.setMovementPerMonth(0);
-                    CustomerDTO customerDTO = new CustomerDTO();
-                    customerDTO.setId(customer.getId());
-                    customerDTO.setName(customer.getName());
-                    customerDTO.setCustomerIdentityNumber(customer.getCustomerIdentityNumber());
-                    customerDTO.setCode(customer.getCustomerType().getCode());
-                    account.setCustomer(customerDTO);
+                    LOGGER.info("El customer type es:{}" + customer.getCustomerType().getCode());
+                    account.setCustomer(CustomerDTO.builder()
+                            .name(customer.getName()).code(customer.getCustomerType().getCode())
+                            .customerIdentityNumber(customer.getCustomerIdentityNumber()).build());
                     if(customer.getCustomerType().getCode().equals("2001")
                             ||customer.getCustomerType().getCode().equals("2002")) {
                         return service.create(account);
@@ -122,6 +114,13 @@ public class AccountHandler {
                 ).switchIfEmpty(ServerResponse.badRequest().build());
     }
 
+    public Mono<ServerResponse> findByCustomerIdentityNumber(ServerRequest request) {
+        String customerIdentityNumber = request.pathVariable("customerIdentityNumber");
+        return service.findByCustomerIdentityNumber(customerIdentityNumber)
+                .flatMap(c -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(c)))
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
     /**
      * Add card holder mono.
      *
@@ -154,12 +153,10 @@ public class AccountHandler {
      * @param request the request
      * @return the mono
      */
-    public Mono<ServerResponse> findByCustomerIdentityNumber(ServerRequest request){
+    public Mono<ServerResponse> findAllByCustomerIdentityNumber(ServerRequest request){
         String customerIdentityNumber = request.pathVariable("customerIdentityNumber");
-        return  service.findByCustomerIdentityNumber(customerIdentityNumber)
-                .flatMap(c -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(c)))
-                .switchIfEmpty(ServerResponse.notFound().build());
+        return  ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                .body(service.findAllByCustomerIdentityNumber(customerIdentityNumber), Account.class);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.bootcamp.msCurrentAccount.services;
 
 import com.bootcamp.msCurrentAccount.models.entities.Account;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -13,7 +14,9 @@ public interface IAccountService extends ICRUDService<Account,String> {
      * @param customerIdentityNumber the customer identity number
      * @return the mono
      */
-    public Mono<Account> findByCustomerIdentityNumber(String customerIdentityNumber);
+    Flux<Account> findAllByCustomerIdentityNumber(String customerIdentityNumber);
+
+    Mono<Account> findByCustomerIdentityNumber(String customerIdentityNumber);
 
     /**
      * Validate customer identity number mono.
@@ -21,7 +24,7 @@ public interface IAccountService extends ICRUDService<Account,String> {
      * @param customerIdentityNumber the customer identity number
      * @return the mono
      */
-    public Mono<Account> validateCustomerIdentityNumber(String customerIdentityNumber);
+    Mono<Account> validateCustomerIdentityNumber(String customerIdentityNumber);
 
     /**
      * Find by account number mono.

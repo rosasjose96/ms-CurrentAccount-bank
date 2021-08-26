@@ -4,6 +4,7 @@ import com.bootcamp.msCurrentAccount.models.dto.CustomerDTO;
 import com.bootcamp.msCurrentAccount.models.dto.Titular;
 import com.bootcamp.msCurrentAccount.models.entities.Account;
 import com.bootcamp.msCurrentAccount.services.IAccountService;
+import com.bootcamp.msCurrentAccount.services.ICreditService;
 import com.bootcamp.msCurrentAccount.services.ICustomerDTOService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,9 @@ public class AccountHandler {
 
     @Autowired
     private ICustomerDTOService customerService;
+
+    @Autowired
+    private ICreditService creditService;
 
     /**
      * Find all mono.
@@ -89,23 +93,28 @@ public class AccountHandler {
                     if(customer.getCustomerType().getCode().equals("2001")
                             ||customer.getCustomerType().getCode().equals("2002")) {
                         return service.create(account);
-                    }
-                        return service.validateCustomerIdentityNumber(account.getCustomerIdentityNumber())
+                    }else {
+                        return creditService.validateDebtorCredit(account.getCustomerIdentityNumber())
+                                .flatMap(debtor -> {
+                                    if(debtor == true) {
+                                        return Mono.empty();
+                                    }else return service.validateCustomerIdentityNumber(account.getCustomerIdentityNumber());
+                                })
                                 .flatMap(accountFound -> {
                                     account.setFirmantes(null);
                                     if (accountFound.getCustomerIdentityNumber() != null) {
                                         LOGGER.info("La cuenta encontrada es: " + accountFound.getCustomerIdentityNumber());
                                         return Mono.error(new RuntimeException("THERE IS AN ACCOUNT WITH THIS CUSTOMER ALREADY"));
-                                    } else if(!account.getCustomer().getCustomerIdentityNumber()
-                                            .equals(account.getTitulares().get(0).getDni())){
+                                    } else if (!account.getCustomer().getCustomerIdentityNumber()
+                                            .equals(account.getTitulares().get(0).getDni())) {
                                         LOGGER.info("El dni del itular y el cliente son diferentes cuando el customer es personal ");
                                         return Mono.error(new RuntimeException("THERE IS AN ACCOUNT WITH THIS CUSTOMER ALREADY"));
-                                    }
-                                    else {
+                                    } else {
                                         LOGGER.info("No encontró nada: ");
                                         return service.create(account);
                                     }
                                 });
+                    }
                 }))
                 .flatMap( c -> ServerResponse
                         .ok()
